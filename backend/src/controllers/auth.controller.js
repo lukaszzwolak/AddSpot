@@ -88,7 +88,6 @@ export const login = async (req, res) => {
           .send({ message: "Login or password are incorrect" });
       }
 
-      // zapis loginu w sesji (jak na materiałach)
       req.session.login = user.login;
       return res.status(200).send({ message: "Login successful" });
     } else {
@@ -100,11 +99,6 @@ export const login = async (req, res) => {
   }
 };
 
-// GET /api/auth/me (albo /getUser) — zwraca login z sesji
-export const getUser = (req, res) => {
-  if (req.session?.login) {
-    return res.status(200).send({ login: req.session.login });
-  } else {
-    return res.status(401).send({ message: "You are not authorized" });
-  }
+export const getUser = async (req, res) => {
+  res.status(200).send({ login: req.session.login });
 };
