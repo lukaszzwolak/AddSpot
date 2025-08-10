@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
+import Session from "../models/Session.model.js";
 
 export const register = async (req, res) => {
   try {
@@ -75,20 +76,19 @@ export const login = async (req, res) => {
       typeof password === "string"
     ) {
       const user = await User.findOne({ login: login.trim().toLowerCase() });
-      if (!user) {
+      if (!user)
         return res
           .status(400)
           .send({ message: "Login or password are incorrect" });
-      }
 
       const ok = await bcrypt.compare(password, user.password);
-      if (!ok) {
+      if (!ok)
         return res
           .status(400)
           .send({ message: "Login or password are incorrect" });
-      }
 
-      req.session.login = user.login;
+      req.session.user = { id: String(user._id), login: user.login };
+
       return res.status(200).send({ message: "Login successful" });
     } else {
       return res.status(400).send({ message: "Bad request" });
@@ -99,6 +99,22 @@ export const login = async (req, res) => {
   }
 };
 
+// GET /api/auth/user
 export const getUser = async (req, res) => {
-  res.status(200).send({ login: req.session.login });
+  if (!req.session?.user)
+    return res.status(401).send({ message: "You are not authorized" });
+  return res.status(200).send({ user: req.session.user });
+};
+
+// DELETE /api/auth/logout
+export const logout = async (req, res) => {
+  try {
+    if (process.env.NODE_ENV !== "production") {
+      await Session.deleteMany({});
+      return res.status(204).end();
+    }
+    req.session.destroy(() => res.status(204).end());
+  } catch {
+    return res.status(500).send({ message: "Internal server error" });
+  }
 };
