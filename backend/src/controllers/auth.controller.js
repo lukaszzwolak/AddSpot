@@ -88,6 +88,8 @@ export const login = async (req, res) => {
           .send({ message: "Login or password are incorrect" });
       }
 
+      // zapis loginu w sesji (jak na materiałach)
+      req.session.login = user.login;
       return res.status(200).send({ message: "Login successful" });
     } else {
       return res.status(400).send({ message: "Bad request" });
@@ -95,5 +97,14 @@ export const login = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+// GET /api/auth/me (albo /getUser) — zwraca login z sesji
+export const getUser = (req, res) => {
+  if (req.session?.login) {
+    return res.status(200).send({ login: req.session.login });
+  } else {
+    return res.status(401).send({ message: "You are not authorized" });
   }
 };
