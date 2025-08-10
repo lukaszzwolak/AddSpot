@@ -1,0 +1,12 @@
+{
+  "name": "adspot",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n FE,BE \"yarn --cwd frontend dev\" \"yarn --cwd backend dev\"",
+    "build": "yarn --cwd frontend build",
+    "start": "yarn --cwd backend start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
