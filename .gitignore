@@ -16,3 +16,6 @@ backend/.env
 # misc
 *.log
 .DS_Store
+
+backend/yarn.lock
+frontend/yarn.lock
