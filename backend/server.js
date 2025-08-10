@@ -7,8 +7,8 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 import adsRouter from "./src/routes/ads.js";
+import authRouter from "./src/routes/auth.routes.js";
 
-// __dirname w ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -23,7 +23,7 @@ const MONGO_URL = process.env.MONGO_URL;
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev-secret";
 
 if (!MONGO_URL) {
-  console.error(" MONGO_URL is missing. Add it to .env");
+  console.error("MONGO_URL is missing. Add it to .env");
   process.exit(1);
 }
 
@@ -31,6 +31,7 @@ app.set("trust proxy", 1);
 
 app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use(
   session({
@@ -47,7 +48,9 @@ app.use(
   })
 );
 
+// API
 app.use("/api/ads", adsRouter);
+app.use("/api/auth", authRouter);
 
 await mongoose.connect(MONGO_URL);
 app.listen(PORT, () => console.log(`API on http://localhost:${PORT}`));
